@@ -1,0 +1,29 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+URL="$1"
+REPO_DIR="$HOME/pocket-clipper"
+
+# Only process YouTube links
+if [[ "$URL" != *"youtube.com"* && "$URL" != *"youtu.be"* ]]; then
+    echo "Not a YouTube URL: $URL"
+    read -p "Press Enter to exit..."
+    exit 1
+fi
+
+# Prevent Android from sleeping mid-render
+termux-wake-lock
+
+echo "=== Pocket Clipper ==="
+echo "URL: $URL"
+read -p "Number of clips [default: 3]: " CLIPS
+CLIPS=${CLIPS:-3}
+
+read -p "Clip duration in seconds [default: 45]: " DURATION
+DURATION=${DURATION:-45}
+
+cd "$REPO_DIR" || exit 1
+python clipper.py "$URL" --clips "$CLIPS" --duration "$DURATION"
+
+termux-wake-unlock
+echo ""
+read -p "Done! Press Enter to close Termux..."
